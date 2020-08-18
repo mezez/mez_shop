@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:my_shop/models/products.dart';
+import 'package:my_shop/models/product.dart';
 import 'package:my_shop/widgets/products_item.dart';
 
 class ProductsOverViewScreen extends StatelessWidget {

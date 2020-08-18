@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:my_shop/screens/product_detail_screen.dart';
 
 class ProductItem extends StatelessWidget {
   final String id;
@@ -13,9 +14,20 @@ class ProductItem extends StatelessWidget {
       //CLip Rounded Rectangles
       borderRadius: BorderRadius.circular(10),
       child: GridTile(
-        child: Image.network(
-          imageUrl,
-          fit: BoxFit.cover,
+        child: GestureDetector(
+          onTap: () {
+            //CREATE ROUTE ON THE FLY
+            // Navigator.of(context).push(MaterialPageRoute(
+            //     builder: (ctx) => ProductDetailScreen(title)));
+
+            //NAMED ROUTE
+            Navigator.of(context)
+                .pushNamed(ProductDetailScreen.routeName, arguments: id);
+          },
+          child: Image.network(
+            imageUrl,
+            fit: BoxFit.cover,
+          ),
         ),
         footer: GridTileBar(
           leading: IconButton(
