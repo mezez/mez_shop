@@ -2,7 +2,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-import '../models/product.dart';
+import './product.dart';
 
 //mix in change notifier with products class
 class Products with ChangeNotifier {
