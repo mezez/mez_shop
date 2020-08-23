@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:my_shop/providers/cart.dart';
 import 'package:my_shop/providers/products.dart';
+import 'package:my_shop/widgets/badge.dart';
 
 import 'package:my_shop/widgets/products_grid.dart';
 import 'package:provider/provider.dart';
@@ -42,6 +44,23 @@ class _ProductsOverViewScreenState extends State<ProductsOverViewScreen> {
               ),
             ],
             icon: Icon(Icons.more_vert),
+          ),
+
+          //consumer is alternative to listen at the top level in the builder method which will
+          //trigger a rebuild of the whole widget whenever a change occurs in the cart and this is not efficient
+          //for this use case as only the badge is interesting in the cart
+          // Consumer<Cart>(
+          //     builder: (context, cartData, child) => Badge(
+          //         child: IconButton(
+          //             icon: Icon(Icons.shopping_cart), onPressed: () {}),
+          //         value: cartData.itemCount.toString()))
+
+          //defining the child outside the builder prevents rebuilding the whole consumer whenever the (cart)value changes
+          Consumer<Cart>(
+            builder: (context, cartData, ch) =>
+                Badge(child: ch, value: cartData.itemCount.toString()),
+            child:
+                IconButton(icon: Icon(Icons.shopping_cart), onPressed: () {}),
           )
         ],
       ),
