@@ -18,6 +18,7 @@ class CartScreen extends StatelessWidget {
             child: Padding(
               padding: EdgeInsets.all(8),
               child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
                     'Total',
@@ -34,6 +35,11 @@ class CartScreen extends StatelessWidget {
                               Theme.of(context).primaryTextTheme.title.color),
                     ),
                     backgroundColor: Theme.of(context).primaryColor,
+                  ),
+                  FlatButton(
+                    onPressed: () {},
+                    child: Text('ORDER NOW'),
+                    textColor: Theme.of(context).primaryColor,
                   )
                 ],
               ),
