@@ -27,7 +27,7 @@ class CartScreen extends StatelessWidget {
                   // SizedBox(
                   //   width: 10,
                   // ),
-                  Spacer(),
+                  Spacer(), //takes all space available
                   Chip(
                     label: Text(
                       '\$${cart.totalAmount}',
