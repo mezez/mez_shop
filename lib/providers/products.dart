@@ -46,7 +46,9 @@ class Products with ChangeNotifier {
     // if (_showFavouritesOnly) {
     //   return _items.where((prodItem) => prodItem.isFavourite).toList();
     // }
-    return [..._items];
+    return [
+      ..._items
+    ]; //returning a new list so that items cannot be modified outside this class
   }
 
   List<Product> get favouriteItems {
