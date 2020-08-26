@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:my_shop/providers/cart.dart'
     show Cart; //only interested in the Cart provider not the whole class
+import 'package:my_shop/providers/orders.dart';
 //this avoid name clash with the cart item imported below, alternative is to use a prefix as seen below commented
 
 // import 'package:my_shop/widgets/cart_item.dart' as Ci;
@@ -43,7 +44,11 @@ class CartScreen extends StatelessWidget {
                     backgroundColor: Theme.of(context).primaryColor,
                   ),
                   FlatButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Provider.of<Orders>(context, listen: false).addOrder(
+                          cart.items.values.toList(), cart.totalAmount);
+                      cart.clear();
+                    },
                     child: Text('ORDER NOW'),
                     textColor: Theme.of(context).primaryColor,
                   ),
