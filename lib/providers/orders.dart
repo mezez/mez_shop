@@ -20,7 +20,7 @@ class Orders with ChangeNotifier {
 
   List<OrderItem> get orders {
     return [
-      ...orders
+      ..._orders
     ]; //returning a new list so that orders cannot be modified outside this class
   }
 
