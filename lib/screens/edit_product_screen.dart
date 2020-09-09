@@ -9,13 +9,29 @@ class EditProductScreen extends StatefulWidget {
 class _EditProductScreenState extends State<EditProductScreen> {
   final _priceFocusNode = FocusNode();
   final _decriptionFocusNode = FocusNode();
+  final _imageUrlController = TextEditingController();
+  final _imageUrlFocusNode = FocusNode();
+
+  @override
+  void initState() {
+    _imageUrlFocusNode.addListener(_updateImageUrl);
+    super.initState();
+  }
 
 //clear focus nodes when state gets cleared to avoid memory leak
   @override
   void dispose() {
+    _imageUrlFocusNode.removeListener(_updateImageUrl);
     _priceFocusNode.dispose();
     _decriptionFocusNode.dispose();
+    _imageUrlController.dispose();
     super.dispose();
+  }
+
+  _updateImageUrl() {
+    if (!_imageUrlFocusNode.hasFocus) {
+      setState(() {}); //rebuilt screen,though we don't set the state our self
+    }
   }
 
   @override
@@ -57,6 +73,38 @@ class _EditProductScreenState extends State<EditProductScreen> {
               keyboardType: TextInputType.multiline,
               focusNode: _decriptionFocusNode,
             ),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Container(
+                  width: 100,
+                  height: 100,
+                  margin: EdgeInsets.only(top: 8, right: 10),
+                  decoration: BoxDecoration(
+                      border: Border.all(width: 1, color: Colors.grey)),
+                  child: _imageUrlController.text.isEmpty
+                      ? Text('Enter a URL')
+                      : FittedBox(
+                          child: Image.network(
+                            _imageUrlController.text,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                ),
+                //note that textformfields takes as much width as it can get, so this will be problematic as a direct child
+                // of a row which is unbounded by default
+                Expanded(
+                  child: TextFormField(
+                    decoration: InputDecoration(labelText: 'Image URL'),
+                    keyboardType: TextInputType.url,
+                    textInputAction: TextInputAction.done,
+                    controller:
+                        _imageUrlController, //using controller as we want to get the input value BEFORE the form is submitted
+                    focusNode: _imageUrlFocusNode,
+                  ),
+                )
+              ],
+            )
           ],
         )),
       ),
