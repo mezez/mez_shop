@@ -7,6 +7,8 @@ class EditProductScreen extends StatefulWidget {
 }
 
 class _EditProductScreenState extends State<EditProductScreen> {
+  final _priceFocusNode = FocusNode();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -23,6 +25,19 @@ class _EditProductScreenState extends State<EditProductScreen> {
               textInputAction:
                   TextInputAction.next, //make bottom right button show next
               //in soft keyboard instead of submit
+              onFieldSubmitted: (value) {
+                FocusScope.of(context)
+                    .requestFocus(_priceFocusNode); //use this to tell flutter
+                //form where to put the input focus after the submit/next button has been clicked
+              },
+            ),
+            TextFormField(
+              decoration: InputDecoration(labelText: 'Price'),
+              textInputAction:
+                  TextInputAction.next, //make bottom right button show next
+              //in soft keyboard instead of submit
+              keyboardType: TextInputType.number,
+              focusNode: _priceFocusNode,
             ),
           ],
         )),
