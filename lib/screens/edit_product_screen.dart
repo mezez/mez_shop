@@ -39,6 +39,11 @@ class _EditProductScreenState extends State<EditProductScreen> {
   }
 
   void _saveForm() {
+    final isValid = _form.currentState
+        .validate(); //trigger all validators. ALternatively, use autovalidate key in textformfield
+    if (!isValid) {
+      return; //stop function execution if validation fails
+    }
     _form.currentState.save();
     print(_editedProduct.title);
     print(_editedProduct.imageUrl);
@@ -68,6 +73,12 @@ class _EditProductScreenState extends State<EditProductScreen> {
                     FocusScope.of(context).requestFocus(
                         _priceFocusNode); //use this to tell flutter
                     //form where to put the input focus after the submit/next button has been clicked
+                  },
+                  validator: (value) {
+                    if (value.isEmpty) {
+                      return 'Please provide a value';
+                    }
+                    return null;
                   },
                   onSaved: (newValue) {
                     _editedProduct = Product(
