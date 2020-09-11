@@ -34,6 +34,13 @@ class _EditProductScreenState extends State<EditProductScreen> {
 
   void _updateImageUrl() {
     if (!_imageUrlFocusNode.hasFocus) {
+      if (_imageUrlController.text.isEmpty ||
+          !_imageUrlController.text.startsWith('http') ||
+          !_imageUrlController.text.endsWith('.png') ||
+          !_imageUrlController.text.endsWith('jpg') ||
+          !_imageUrlController.text.endsWith('.jpeg')) {
+        return;
+      }
       setState(() {}); //rebuilt screen,though we don't set the state our self
     }
   }
@@ -97,6 +104,18 @@ class _EditProductScreenState extends State<EditProductScreen> {
                     onFieldSubmitted: (_) {
                       FocusScope.of(context).requestFocus(_decriptionFocusNode);
                     },
+                    validator: (value) {
+                      if (value.isEmpty) {
+                        return 'Please enter a price';
+                      }
+                      if (double.tryParse(value) == null) {
+                        return 'Please enter a valid number';
+                      }
+                      if (double.parse(value) <= 0) {
+                        return 'Please enter a number greater than 0';
+                      }
+                      return null;
+                    },
                     onSaved: (newValue) {
                       _editedProduct = Product(
                           id: _editedProduct.id,
@@ -112,6 +131,15 @@ class _EditProductScreenState extends State<EditProductScreen> {
                     //however the enter button this time is for going to a new line
                     keyboardType: TextInputType.multiline,
                     focusNode: _decriptionFocusNode,
+                    validator: (value) {
+                      if (value.isEmpty) {
+                        return 'Please enter a description';
+                      }
+                      if (value.length > 10) {
+                        return 'Should be at least 10 characters long';
+                      }
+                      return null;
+                    },
                     onSaved: (newValue) {
                       _editedProduct = Product(
                           id: _editedProduct.id,
@@ -148,6 +176,22 @@ class _EditProductScreenState extends State<EditProductScreen> {
                           controller:
                               _imageUrlController, //using controller as we want to get the input value BEFORE the form is submitted
                           focusNode: _imageUrlFocusNode,
+                          validator: (value) {
+                            if (value.isEmpty) {
+                              return 'Please enter an image url';
+                            }
+                            if (!value.startsWith('http') ||
+                                !value.startsWith('https')) {
+                              return 'Please enter a valid url';
+                            }
+                            if (!value.endsWith('.png') ||
+                                !value.endsWith('jpg') ||
+                                !value.endsWith('.jpeg')) {
+                              return 'Please enter a valid image url';
+                            }
+
+                            return null;
+                          },
                           onFieldSubmitted: (_) {
                             //an anonymous function is used here to call the function because calling the pointer directly won't work
                             //onFieldSubmitted by default would want a function that takes a string value as argument
