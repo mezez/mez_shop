@@ -1,6 +1,9 @@
 //mixin class
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart'
+    as http; //prevent name clashes as this package bundles many features
+import 'dart:convert';
 
 import './product.dart';
 
@@ -70,6 +73,16 @@ class Products with ChangeNotifier {
   // }
 
   void addProduct(Product product) {
+    const url = 'https://mez-shop.firebaseio.com/products.json';
+    //send post request
+    http.post(url,
+        body: json.encode({
+          'title': product.title,
+          'description': product.description,
+          'imageUrl': product.imageUrl,
+          'price': product.price,
+          'isFavourite': product.isFavourite,
+        }));
     final newProduct = Product(
         title: product.title,
         description: product.description,
