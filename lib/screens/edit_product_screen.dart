@@ -180,7 +180,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                       if (value.isEmpty) {
                         return 'Please enter a description';
                       }
-                      if (value.length > 10) {
+                      if (value.length < 10) {
                         return 'Should be at least 10 characters long';
                       }
                       return null;
@@ -232,8 +232,8 @@ class _EditProductScreenState extends State<EditProductScreen> {
                                 !value.startsWith('https')) {
                               return 'Please enter a valid url';
                             }
-                            if (!value.endsWith('.png') ||
-                                !value.endsWith('jpg') ||
+                            if (!value.endsWith('.png') &&
+                                !value.endsWith('jpg') &&
                                 !value.endsWith('.jpeg')) {
                               return 'Please enter a valid image url';
                             }
