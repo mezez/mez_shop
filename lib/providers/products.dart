@@ -72,10 +72,12 @@ class Products with ChangeNotifier {
   //   notifyListeners();
   // }
 
-  void addProduct(Product product) {
+  Future<void> addProduct(Product product) {
     const url = 'https://mez-shop.firebaseio.com/products.json';
     //send post request
-    http
+    //post returns a future and we use this async feature to toggle a spinner where add product is being used
+    //hence the return for the return statement below
+    return http
         .post(url,
             body: json.encode({
               'title': product.title,

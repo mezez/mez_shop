@@ -24,6 +24,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
     'imageUrl': '',
   };
   var _isInit = true;
+  var _isLoading = false;
 
   @override
   void initState() {
@@ -83,15 +84,24 @@ class _EditProductScreenState extends State<EditProductScreen> {
       return; //stop function execution if validation fails
     }
     _form.currentState.save();
+    setState(() {
+      _isLoading = true;
+    });
     //add product to products list
     if (_editedProduct.id != null) {
       //we are updating an existing product
       Provider.of<Products>(context, listen: false)
           .updateProduct(_editedProduct.id, _editedProduct);
     } else {
-      Provider.of<Products>(context, listen: false).addProduct(_editedProduct);
+      Provider.of<Products>(context, listen: false)
+          .addProduct(_editedProduct)
+          .then((_) {
+        setState(() {
+          _isLoading = false;
+        });
+        Navigator.of(context).pop(); //return to previous page
+      });
     }
-    Navigator.of(context).pop(); //return to previous page
   }
 
   @override
@@ -103,164 +113,171 @@ class _EditProductScreenState extends State<EditProductScreen> {
           onPressed: _saveForm,
         )
       ]),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-            key: _form, //used for interacting with the form data in state
-            child: ListView(
-              children: [
-                TextFormField(
-                  initialValue: _initValues['title'],
-                  decoration: InputDecoration(labelText: 'Title'),
-                  textInputAction:
-                      TextInputAction.next, //make bottom right button show next
-                  //in soft keyboard instead of submit
-                  onFieldSubmitted: (value) {
-                    FocusScope.of(context).requestFocus(
-                        _priceFocusNode); //use this to tell flutter
-                    //form where to put the input focus after the submit/next button has been clicked
-                  },
-                  validator: (value) {
-                    if (value.isEmpty) {
-                      return 'Please provide a value';
-                    }
-                    return null;
-                  },
-                  onSaved: (newValue) {
-                    _editedProduct = Product(
-                      id: _editedProduct.id,
-                      title: newValue,
-                      description: _editedProduct.description,
-                      price: _editedProduct.price,
-                      imageUrl: _editedProduct.imageUrl,
-                      isFavourite: _editedProduct.isFavourite,
-                    );
-                  },
-                ),
-                TextFormField(
-                    initialValue: _initValues['price'],
-                    decoration: InputDecoration(labelText: 'Price'),
-                    textInputAction: TextInputAction.next,
-                    keyboardType: TextInputType.number,
-                    focusNode: _priceFocusNode,
-                    onFieldSubmitted: (_) {
-                      FocusScope.of(context).requestFocus(_decriptionFocusNode);
-                    },
-                    validator: (value) {
-                      if (value.isEmpty) {
-                        return 'Please enter a price';
-                      }
-                      if (double.tryParse(value) == null) {
-                        return 'Please enter a valid number';
-                      }
-                      if (double.parse(value) <= 0) {
-                        return 'Please enter a number greater than 0';
-                      }
-                      return null;
-                    },
-                    onSaved: (newValue) {
-                      _editedProduct = Product(
-                        id: _editedProduct.id,
-                        title: _editedProduct.title,
-                        description: _editedProduct.description,
-                        price: double.parse(newValue),
-                        imageUrl: _editedProduct.imageUrl,
-                        isFavourite: _editedProduct.isFavourite,
-                      );
-                    }),
-                TextFormField(
-                    initialValue: _initValues['description'],
-                    decoration: InputDecoration(labelText: 'Description'),
-                    maxLines:
-                        3, //automatically gives us a next button, so no need for text input action next
-                    //however the enter button this time is for going to a new line
-                    keyboardType: TextInputType.multiline,
-                    focusNode: _decriptionFocusNode,
-                    validator: (value) {
-                      if (value.isEmpty) {
-                        return 'Please enter a description';
-                      }
-                      if (value.length < 10) {
-                        return 'Should be at least 10 characters long';
-                      }
-                      return null;
-                    },
-                    onSaved: (newValue) {
-                      _editedProduct = Product(
-                        id: _editedProduct.id,
-                        title: _editedProduct.title,
-                        description: newValue,
-                        price: _editedProduct.price,
-                        imageUrl: _editedProduct.imageUrl,
-                        isFavourite: _editedProduct.isFavourite,
-                      );
-                    }),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Container(
-                      width: 100,
-                      height: 100,
-                      margin: EdgeInsets.only(top: 8, right: 10),
-                      decoration: BoxDecoration(
-                          border: Border.all(width: 1, color: Colors.grey)),
-                      child: _imageUrlController.text.isEmpty
-                          ? Text('Enter a URL')
-                          : FittedBox(
-                              child: Image.network(
-                                _imageUrlController.text,
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                    ),
-                    //note that textformfields takes as much width as it can get, so this will be problematic as a direct child
-                    // of a row which is unbounded by default
-                    Expanded(
-                      child: TextFormField(
-                          // initialValue: _initValues['imageUrl'], //cannot use this here since a controllee is being used
-                          decoration: InputDecoration(labelText: 'Image URL'),
-                          keyboardType: TextInputType.url,
-                          textInputAction: TextInputAction.done,
-                          controller:
-                              _imageUrlController, //using controller as we want to get the input value BEFORE the form is submitted
-                          focusNode: _imageUrlFocusNode,
+      body: _isLoading
+          ? Center(
+              child: CircularProgressIndicator(),
+            )
+          : Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Form(
+                  key: _form, //used for interacting with the form data in state
+                  child: ListView(
+                    children: [
+                      TextFormField(
+                        initialValue: _initValues['title'],
+                        decoration: InputDecoration(labelText: 'Title'),
+                        textInputAction: TextInputAction
+                            .next, //make bottom right button show next
+                        //in soft keyboard instead of submit
+                        onFieldSubmitted: (value) {
+                          FocusScope.of(context).requestFocus(
+                              _priceFocusNode); //use this to tell flutter
+                          //form where to put the input focus after the submit/next button has been clicked
+                        },
+                        validator: (value) {
+                          if (value.isEmpty) {
+                            return 'Please provide a value';
+                          }
+                          return null;
+                        },
+                        onSaved: (newValue) {
+                          _editedProduct = Product(
+                            id: _editedProduct.id,
+                            title: newValue,
+                            description: _editedProduct.description,
+                            price: _editedProduct.price,
+                            imageUrl: _editedProduct.imageUrl,
+                            isFavourite: _editedProduct.isFavourite,
+                          );
+                        },
+                      ),
+                      TextFormField(
+                          initialValue: _initValues['price'],
+                          decoration: InputDecoration(labelText: 'Price'),
+                          textInputAction: TextInputAction.next,
+                          keyboardType: TextInputType.number,
+                          focusNode: _priceFocusNode,
+                          onFieldSubmitted: (_) {
+                            FocusScope.of(context)
+                                .requestFocus(_decriptionFocusNode);
+                          },
                           validator: (value) {
                             if (value.isEmpty) {
-                              return 'Please enter an image url';
+                              return 'Please enter a price';
                             }
-                            if (!value.startsWith('http') ||
-                                !value.startsWith('https')) {
-                              return 'Please enter a valid url';
+                            if (double.tryParse(value) == null) {
+                              return 'Please enter a valid number';
                             }
-                            if (!value.endsWith('.png') &&
-                                !value.endsWith('jpg') &&
-                                !value.endsWith('.jpeg')) {
-                              return 'Please enter a valid image url';
+                            if (double.parse(value) <= 0) {
+                              return 'Please enter a number greater than 0';
                             }
-
                             return null;
-                          },
-                          onFieldSubmitted: (_) {
-                            //an anonymous function is used here to call the function because calling the pointer directly won't work
-                            //onFieldSubmitted by default would want a function that takes a string value as argument
-                            _saveForm();
                           },
                           onSaved: (newValue) {
                             _editedProduct = Product(
                               id: _editedProduct.id,
                               title: _editedProduct.title,
                               description: _editedProduct.description,
-                              price: _editedProduct.price,
-                              imageUrl: newValue,
+                              price: double.parse(newValue),
+                              imageUrl: _editedProduct.imageUrl,
                               isFavourite: _editedProduct.isFavourite,
                             );
                           }),
-                    )
-                  ],
-                )
-              ],
-            )),
-      ),
+                      TextFormField(
+                          initialValue: _initValues['description'],
+                          decoration: InputDecoration(labelText: 'Description'),
+                          maxLines:
+                              3, //automatically gives us a next button, so no need for text input action next
+                          //however the enter button this time is for going to a new line
+                          keyboardType: TextInputType.multiline,
+                          focusNode: _decriptionFocusNode,
+                          validator: (value) {
+                            if (value.isEmpty) {
+                              return 'Please enter a description';
+                            }
+                            if (value.length < 10) {
+                              return 'Should be at least 10 characters long';
+                            }
+                            return null;
+                          },
+                          onSaved: (newValue) {
+                            _editedProduct = Product(
+                              id: _editedProduct.id,
+                              title: _editedProduct.title,
+                              description: newValue,
+                              price: _editedProduct.price,
+                              imageUrl: _editedProduct.imageUrl,
+                              isFavourite: _editedProduct.isFavourite,
+                            );
+                          }),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Container(
+                            width: 100,
+                            height: 100,
+                            margin: EdgeInsets.only(top: 8, right: 10),
+                            decoration: BoxDecoration(
+                                border:
+                                    Border.all(width: 1, color: Colors.grey)),
+                            child: _imageUrlController.text.isEmpty
+                                ? Text('Enter a URL')
+                                : FittedBox(
+                                    child: Image.network(
+                                      _imageUrlController.text,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                          ),
+                          //note that textformfields takes as much width as it can get, so this will be problematic as a direct child
+                          // of a row which is unbounded by default
+                          Expanded(
+                            child: TextFormField(
+                                // initialValue: _initValues['imageUrl'], //cannot use this here since a controllee is being used
+                                decoration:
+                                    InputDecoration(labelText: 'Image URL'),
+                                keyboardType: TextInputType.url,
+                                textInputAction: TextInputAction.done,
+                                controller:
+                                    _imageUrlController, //using controller as we want to get the input value BEFORE the form is submitted
+                                focusNode: _imageUrlFocusNode,
+                                validator: (value) {
+                                  if (value.isEmpty) {
+                                    return 'Please enter an image url';
+                                  }
+                                  if (!value.startsWith('http') ||
+                                      !value.startsWith('https')) {
+                                    return 'Please enter a valid url';
+                                  }
+                                  if (!value.endsWith('.png') &&
+                                      !value.endsWith('jpg') &&
+                                      !value.endsWith('.jpeg')) {
+                                    return 'Please enter a valid image url';
+                                  }
+
+                                  return null;
+                                },
+                                onFieldSubmitted: (_) {
+                                  //an anonymous function is used here to call the function because calling the pointer directly won't work
+                                  //onFieldSubmitted by default would want a function that takes a string value as argument
+                                  _saveForm();
+                                },
+                                onSaved: (newValue) {
+                                  _editedProduct = Product(
+                                    id: _editedProduct.id,
+                                    title: _editedProduct.title,
+                                    description: _editedProduct.description,
+                                    price: _editedProduct.price,
+                                    imageUrl: newValue,
+                                    isFavourite: _editedProduct.isFavourite,
+                                  );
+                                }),
+                          )
+                        ],
+                      )
+                    ],
+                  )),
+            ),
     );
   }
 }
