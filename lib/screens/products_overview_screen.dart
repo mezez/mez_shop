@@ -17,6 +17,28 @@ class ProductsOverViewScreen extends StatefulWidget {
 
 class _ProductsOverViewScreenState extends State<ProductsOverViewScreen> {
   var _showOnlyFavourites = false;
+  var _isInit = true;
+
+  @override
+  void initState() {
+    //Provider.of<Products>(context).fetchAndSetProducts(); //context won't be immediately available as widget
+    // Future.delayed(Duration.zero).then((_) { //alternative hack to the above. Second option can be found in the
+    //didChangeDependencies lifecycle method
+    //   Provider.of<Products>(context).fetchAndSetProducts();
+    // });
+
+    super.initState();
+  }
+
+  @override
+  void didChangeDependencies() {
+    if (_isInit) {
+      Provider.of<Products>(context).fetchAndSetProducts();
+    }
+    _isInit = false;
+    super.didChangeDependencies();
+  }
+
   @override
   Widget build(BuildContext context) {
     // final productsContainer = Provider.of<Products>(context, listen: false);
