@@ -77,7 +77,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
     }
   }
 
-  void _saveForm() {
+  Future<void> _saveForm() async {
     final isValid = _form.currentState
         .validate(); //trigger all validators. ALternatively, use autovalidate key in textformfield
     if (!isValid) {
@@ -93,10 +93,11 @@ class _EditProductScreenState extends State<EditProductScreen> {
       Provider.of<Products>(context, listen: false)
           .updateProduct(_editedProduct.id, _editedProduct);
     } else {
-      Provider.of<Products>(context, listen: false)
-          .addProduct(_editedProduct)
-          .catchError((error) {
-        return showDialog(
+      try {
+        await Provider.of<Products>(context, listen: false)
+            .addProduct(_editedProduct);
+      } catch (error) {
+        await showDialog(
             context: context,
             builder: (ctx) => AlertDialog(
                   title: Text('An error occurred!'),
@@ -110,12 +111,13 @@ class _EditProductScreenState extends State<EditProductScreen> {
                         child: Text('Okay'))
                   ],
                 ));
-      }).then((_) {
+      } finally {
+        //should always run
         setState(() {
           _isLoading = false;
         });
         Navigator.of(context).pop(); //return to previous page
-      });
+      }
     }
   }
 
