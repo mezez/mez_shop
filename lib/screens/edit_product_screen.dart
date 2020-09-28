@@ -267,7 +267,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                                   if (value.isEmpty) {
                                     return 'Please enter an image url';
                                   }
-                                  if (!value.startsWith('http') ||
+                                  if (!value.startsWith('http') &&
                                       !value.startsWith('https')) {
                                     return 'Please enter a valid url';
                                   }
