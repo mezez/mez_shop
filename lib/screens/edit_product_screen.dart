@@ -90,7 +90,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
     //add product to products list
     if (_editedProduct.id != null) {
       //we are updating an existing product
-      Provider.of<Products>(context, listen: false)
+      await Provider.of<Products>(context, listen: false)
           .updateProduct(_editedProduct.id, _editedProduct);
     } else {
       try {
@@ -111,14 +111,19 @@ class _EditProductScreenState extends State<EditProductScreen> {
                         child: Text('Okay'))
                   ],
                 ));
-      } finally {
-        //should always run
-        setState(() {
-          _isLoading = false;
-        });
-        Navigator.of(context).pop(); //return to previous page
       }
+      // finally {
+      //   //should always run
+      //   setState(() {
+      //     _isLoading = false;
+      //   });
+      //   Navigator.of(context).pop(); //return to previous page
+      // }
     }
+    setState(() {
+      _isLoading = false;
+    });
+    Navigator.of(context).pop(); //return to previous page
   }
 
   @override
