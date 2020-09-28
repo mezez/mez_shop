@@ -190,28 +190,25 @@ class Products with ChangeNotifier {
     }
   }
 
-  void deleteProduct(String id) {
+  Future<void> deleteProduct(String id) async {
     final url = 'https://mez-shop.firebaseio.com/products/$id.json';
     //optimistic updating (deleting)
     final existingProductIndex = _items.indexWhere((prod) => prod.id == id);
     var existingProduct = _items[existingProductIndex];
-    http.delete(url).then((response) {
-      if (response.statusCode >= 400) {
-        //throw custom error
-        throw HttpException(
-            'Could not delete product.'); //A custom exception class
-      }
-      existingProduct =
-          null; //clear the reference in memory, flutter handles the rest of cleanup
-    }).catchError((_) {
-      //re-insert the item to the list at its original index if deletion fails.
-      //this is an alternative to async and await or then and catch, so we don't have to delay a user if deletion is outright successful
-      //the expectation is usually optimistic ie deletion will be successful
-      _items.insert(existingProductIndex, existingProduct);
-      notifyListeners();
-    });
+    final response = await http.delete(url);
     _items.removeAt(
         existingProductIndex); //remove item from list but not in memory. We still have reference to it above
     notifyListeners();
+
+    if (response.statusCode >= 400) {
+      //re-insert the item to the list at its original index if deletion fails.
+      _items.insert(existingProductIndex, existingProduct);
+      notifyListeners();
+      //throw custom error
+      throw HttpException(
+          'Could not delete product.'); //A custom exception class
+    }
+    existingProduct =
+        null; //clear the reference in memory, flutter handles the rest of cleanup
   }
 }
