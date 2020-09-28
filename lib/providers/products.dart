@@ -190,7 +190,23 @@ class Products with ChangeNotifier {
   }
 
   void deleteProduct(String id) {
-    _items.removeWhere((prod) => prod.id == id);
+    final url = 'https://mez-shop.firebaseio.com/products/$id.json';
+    //optimistic updating (deleting)
+    final existingProductIndex = _items.indexWhere((prod) => prod.id == id);
+    var existingProduct = _items[existingProductIndex];
+    _items.removeAt(
+        existingProductIndex); //remove item from list but not in memory. We still have reference to it above
+    notifyListeners();
+    http.delete(url).then((_) {
+      existingProduct =
+          null; //clear the reference in memory, flutter handles the rest of cleanup
+    }).catchError((_) {
+      //re-insert the item to the list at its original index if deletion fails.
+      //this is an alternative to async and await or then and catch, so we don't have to delay a user if deletion is outright successful
+      //the expectation is usually optimistic ie deletion will be successful
+      _items.insert(existingProductIndex, existingProduct);
+      notifyListeners();
+    });
     notifyListeners();
   }
 }
