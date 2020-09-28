@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart'
     as http; //prevent name clashes as this package bundles many features
+import 'package:my_shop/models/http_exception.dart';
 import 'dart:convert';
 
 import './product.dart';
@@ -194,10 +195,12 @@ class Products with ChangeNotifier {
     //optimistic updating (deleting)
     final existingProductIndex = _items.indexWhere((prod) => prod.id == id);
     var existingProduct = _items[existingProductIndex];
-    _items.removeAt(
-        existingProductIndex); //remove item from list but not in memory. We still have reference to it above
-    notifyListeners();
-    http.delete(url).then((_) {
+    http.delete(url).then((response) {
+      if (response.statusCode >= 400) {
+        //throw custom error
+        throw HttpException(
+            'Could not delete product.'); //A custom exception class
+      }
       existingProduct =
           null; //clear the reference in memory, flutter handles the rest of cleanup
     }).catchError((_) {
@@ -207,6 +210,8 @@ class Products with ChangeNotifier {
       _items.insert(existingProductIndex, existingProduct);
       notifyListeners();
     });
+    _items.removeAt(
+        existingProductIndex); //remove item from list but not in memory. We still have reference to it above
     notifyListeners();
   }
 }
