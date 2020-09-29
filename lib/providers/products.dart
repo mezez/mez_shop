@@ -72,6 +72,9 @@ class Products with ChangeNotifier {
           json.decode(response.body) as Map<String, dynamic>; //dynamic tells
       //flutter that the values are dynamic, (nice in event of being unsure about data type). Can use Object to in this
       //particular case
+      if (extractedData == null) {
+        return;
+      }
       final List<Product> loadedProducts = [];
       extractedData.forEach((prodId, prodData) {
         loadedProducts.add(Product(
