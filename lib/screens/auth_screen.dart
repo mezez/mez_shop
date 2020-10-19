@@ -42,8 +42,10 @@ class AuthScreen extends StatelessWidget {
                       margin: EdgeInsets.only(bottom: 20.0),
                       padding:
                           EdgeInsets.symmetric(vertical: 8.0, horizontal: 94.0),
+                      // transform:transformConfig,
                       transform: Matrix4.rotationZ(-8 * pi / 180)
-                        ..translate(-10.0),
+                        ..translate(
+                            -10.0), //shorthand way of doing the commented line with the cascade (..) operator
                       // ..translate(-10.0),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(20),
