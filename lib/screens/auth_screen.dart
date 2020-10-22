@@ -140,6 +140,8 @@ class _AuthCardState extends State<AuthCard> {
         await Provider.of<Auth>(context, listen: false)
             .signup(_authData['email'], _authData['password']);
       }
+      //if authentication is successful, you can user push replacement to go to shop
+      // Navigator.of(context).pushReplacement('/products-overview'); //replace parameter with an actual registered route
     } on HttpException catch (error) {
       //catch http exceptions specifically
       var errorMessage = 'Authentication failed';

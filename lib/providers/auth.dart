@@ -9,6 +9,19 @@ class Auth with ChangeNotifier {
   DateTime _expiryDate;
   String _userId;
 
+  bool get isAuth {
+    return token != null; //if token is not null, user is authenticated
+  }
+
+  String get token {
+    if (_expiryDate != null &&
+        _expiryDate.isAfter(DateTime.now()) &&
+        _token != null) {
+      return _token;
+    }
+    return null;
+  }
+
   Future<void> _authenticate(
       String email, String password, String urlSegment) async {
     final url =
@@ -20,12 +33,19 @@ class Auth with ChangeNotifier {
             'password': password,
             'returnSecureToken': true
           }));
-      print(json.decode(response.body));
+      // print(json.decode(response.body));
       final responseData = json.decode(response.body);
       //firebase always returns 200 status code. check response body to see if it contains error
       if (responseData['error'] != null) {
         throw HttpException(responseData['error']['message']);
       }
+      //set token
+      _token = responseData['idToken'];
+      _userId = responseData['localId'];
+      _expiryDate = DateTime.now().add(Duration(
+          seconds: int.parse(responseData[
+              'expiresIn']))); //the the expires in seconds to current time to know when it expires
+      notifyListeners();
     } catch (error) {
       throw error;
     }

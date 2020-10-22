@@ -44,7 +44,11 @@ class Products with ChangeNotifier {
     //         'https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Cast-Iron-Pan.jpg/1200px-Cast-Iron-Pan.jpg'),
   ];
 
-  var _showFavouritesOnly = false;
+  // var _showFavouritesOnly = false;
+
+  final String authToken;
+
+  Products(this.authToken, this._items);
 
   List<Product> get items {
     // if (_showFavouritesOnly) {
@@ -64,7 +68,7 @@ class Products with ChangeNotifier {
   }
 
   Future<void> fetchAndSetProducts() async {
-    const url = 'https://mez-shop.firebaseio.com/products.json';
+    final url = 'https://mez-shop.firebaseio.com/products.json?auth=$authToken';
     try {
       final response = await http.get(url);
       // print(json.decode(response.body));
