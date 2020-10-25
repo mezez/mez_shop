@@ -24,14 +24,15 @@ class Product with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> toggleFavouriteStatus() async {
+  Future<void> toggleFavouriteStatus(String authToken) async {
     //employ optimistic update
     final oldStatus = isFavourite;
     isFavourite = !isFavourite;
     notifyListeners();
 
     //send request
-    final url = 'https://mez-shop.firebaseio.com/products/$id.json';
+    final url =
+        'https://mez-shop.firebaseio.com/products/$id.json?auth=$authToken';
     try {
       final response = await http.patch(url,
           body: json.encode({'isFavourite': isFavourite}));

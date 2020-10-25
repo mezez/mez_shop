@@ -143,7 +143,7 @@ class Products with ChangeNotifier {
 
   //async/await and try/catch approach
   Future<void> addProduct(Product product) async {
-    const url = 'https://mez-shop.firebaseio.com/products.json';
+    final url = 'https://mez-shop.firebaseio.com/products.json?auth=$authToken';
     //send post request
     //post returns a future and we use this async feature to toggle a spinner where add product is being used
     //hence the return for the return statement below
@@ -178,7 +178,8 @@ class Products with ChangeNotifier {
   Future<void> updateProduct(String id, Product newProduct) async {
     final prodIndex = _items.indexWhere((prod) => prod.id == id);
     if (prodIndex >= 0) {
-      final url = 'https://mez-shop.firebaseio.com/products/$id.json';
+      final url =
+          'https://mez-shop.firebaseio.com/products/$id.json?auth=$authToken';
       try {
         await http.patch(url,
             body: json.encode({
@@ -198,7 +199,8 @@ class Products with ChangeNotifier {
   }
 
   Future<void> deleteProduct(String id) async {
-    final url = 'https://mez-shop.firebaseio.com/products/$id.json';
+    final url =
+        'https://mez-shop.firebaseio.com/products/$id.json?auth=$authToken';
     //optimistic updating (deleting)
     final existingProductIndex = _items.indexWhere((prod) => prod.id == id);
     var existingProduct = _items[existingProductIndex];
