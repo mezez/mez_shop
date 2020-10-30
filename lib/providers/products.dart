@@ -47,8 +47,9 @@ class Products with ChangeNotifier {
   // var _showFavouritesOnly = false;
 
   final String authToken;
+  final String userId;
 
-  Products(this.authToken, this._items);
+  Products(this.authToken, this.userId, this._items);
 
   List<Product> get items {
     // if (_showFavouritesOnly) {
@@ -68,7 +69,7 @@ class Products with ChangeNotifier {
   }
 
   Future<void> fetchAndSetProducts() async {
-    final url = 'https://mez-shop.firebaseio.com/products.json?auth=$authToken';
+    var url = 'https://mez-shop.firebaseio.com/products.json?auth=$authToken';
     try {
       final response = await http.get(url);
       // print(json.decode(response.body));
@@ -79,6 +80,11 @@ class Products with ChangeNotifier {
       if (extractedData == null) {
         return;
       }
+      //fetch favourite status
+      final url =
+          'https://mez-shop.firebaseio.com/userFavourites/$userId.json?auth=$authToken';
+      final favouriteResponse = await http.get(url);
+      final favouriteData = json.decode(favouriteResponse.body);
       final List<Product> loadedProducts = [];
       extractedData.forEach((prodId, prodData) {
         loadedProducts.add(Product(
@@ -86,8 +92,10 @@ class Products with ChangeNotifier {
             title: prodData['title'],
             description: prodData['description'],
             price: prodData['price'],
-            isFavourite: prodData['isFavourite'],
-            imageUrl: prodData['imageUrl']));
+            isFavourite:
+                favouriteData == null ? false : favouriteData[prodId] ?? false,
+            imageUrl: prodData[
+                'imageUrl'])); //?? checks if favouriteData[prodId] is null defaults to false if so
       });
       _items = loadedProducts;
       notifyListeners();
@@ -154,7 +162,6 @@ class Products with ChangeNotifier {
             'description': product.description,
             'imageUrl': product.imageUrl,
             'price': product.price,
-            'isFavourite': product.isFavourite,
           }));
 
       //save new product after it saves in firebase

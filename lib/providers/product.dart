@@ -34,8 +34,7 @@ class Product with ChangeNotifier {
     final url =
         'https://mez-shop.firebaseio.com/userFavourites/$userId/$id.json?auth=$authToken';
     try {
-      final response = await http.patch(url,
-          body: json.encode({'isFavourite': isFavourite}));
+      final response = await http.put(url, body: json.encode(isFavourite));
       if (response.statusCode >= 400) {
         _setFavValue(oldStatus);
       }
