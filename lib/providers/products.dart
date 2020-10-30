@@ -68,8 +68,11 @@ class Products with ChangeNotifier {
     return _items.firstWhere((prod) => prod.id == id);
   }
 
-  Future<void> fetchAndSetProducts() async {
-    var url = 'https://mez-shop.firebaseio.com/products.json?auth=$authToken';
+  Future<void> fetchAndSetProducts([bool filterByUser = false]) async {
+    final filterString =
+        filterByUser ? 'orderBy="creatorId"&equalTo="$userId"' : '';
+    var url =
+        'https://mez-shop.firebaseio.com/products.json?auth=$authToken&$filterString'; //fetch products
     try {
       final response = await http.get(url);
       // print(json.decode(response.body));
@@ -162,6 +165,7 @@ class Products with ChangeNotifier {
             'description': product.description,
             'imageUrl': product.imageUrl,
             'price': product.price,
+            'creatorId': userId
           }));
 
       //save new product after it saves in firebase
