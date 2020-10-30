@@ -81,7 +81,7 @@ class Products with ChangeNotifier {
         return;
       }
       //fetch favourite status
-      final url =
+      url =
           'https://mez-shop.firebaseio.com/userFavourites/$userId.json?auth=$authToken';
       final favouriteResponse = await http.get(url);
       final favouriteData = json.decode(favouriteResponse.body);
