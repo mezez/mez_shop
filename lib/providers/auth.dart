@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/widgets.dart';
@@ -8,6 +9,7 @@ class Auth with ChangeNotifier {
   String _token;
   DateTime _expiryDate;
   String _userId;
+  Timer _authTimer;
 
   bool get isAuth {
     return token != null; //if token is not null, user is authenticated
@@ -49,6 +51,7 @@ class Auth with ChangeNotifier {
       _expiryDate = DateTime.now().add(Duration(
           seconds: int.parse(responseData[
               'expiresIn']))); //the the expires in seconds to current time to know when it expires
+      _autoLogout(); //automatically log user out if token expires
       notifyListeners();
     } catch (error) {
       throw error;
@@ -67,6 +70,19 @@ class Auth with ChangeNotifier {
     _token = null;
     _userId = null;
     _expiryDate = null;
+    if (_authTimer != null) {
+      _authTimer.cancel();
+      _authTimer = null;
+    }
     notifyListeners();
+  }
+
+  void _autoLogout() {
+    if (_authTimer != null) {
+      _authTimer.cancel(); //cancel existing timers before setting new ones
+    }
+    //set a timer that expires when token expires, call logout afterwards
+    final timeToExpiry = _expiryDate.difference(DateTime.now()).inSeconds;
+    _authTimer = Timer(Duration(seconds: timeToExpiry), logout);
   }
 }
