@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+//FOR SINGLE ROUTE
 class CustomRoute<T> extends MaterialPageRoute<T> {
   CustomRoute({WidgetBuilder builder, RouteSettings settings})
       : super(builder: builder, settings: settings);
@@ -18,6 +19,7 @@ class CustomRoute<T> extends MaterialPageRoute<T> {
   }
 }
 
+//FOR APP-WIDE/THEME LEVEL TRANSITION
 class CustomPageTransitionBuilder extends PageTransitionsBuilder {
   @override
   Widget buildTransitions<T>(
