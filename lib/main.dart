@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:my_shop/helpers/custom_route.dart';
 import 'package:my_shop/providers/auth.dart';
 import 'package:my_shop/providers/cart.dart';
 import 'package:my_shop/providers/orders.dart';
@@ -58,6 +59,13 @@ class MyApp extends StatelessWidget {
               primarySwatch: Colors.purple,
               accentColor: Colors.deepOrange,
               fontFamily: 'Lato',
+
+              //OPTIONAL. THIS OVERRIDES DEFAULT FLUTTER BEHAVIOUR
+              //ADD CUSTOM PAGE TRANSITION ON AN APP-WIDE LEVEL. SEE HELPERS FOLDER
+              pageTransitionsTheme: PageTransitionsTheme(builders: {
+                TargetPlatform.android: CustomPageTransitionBuilder(),
+                TargetPlatform.iOS: CustomPageTransitionBuilder(),
+              }),
               visualDensity: VisualDensity.adaptivePlatformDensity,
             ),
             home: auth.isAuth
