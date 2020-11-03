@@ -18,19 +18,17 @@ class ProductDetailScreen extends StatelessWidget {
     //the widget does not rebuild if changes are made to the provider/global data storage
     //findById is defined in the provider class
     return Scaffold(
-      // appBar: AppBar(
-      //   title: Text(loadedProduct.title),
-      // ),
+      appBar: AppBar(
+        title: Text(loadedProduct.title),
+      ),
       backgroundColor: null,
-      body: CustomScrollView(
-        slivers: [
-          //scrollable areas on the screen
-          SliverAppBar(
-            expandedHeight: 300,
-            pinned: true,
-            flexibleSpace: FlexibleSpaceBar(
-              title: Text(loadedProduct.title),
-              background: Hero(
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            Container(
+              width: double.infinity,
+              height: 300,
+              child: Hero(
                 tag: loadedProduct.id,
                 child: Image.network(
                   loadedProduct.imageUrl,
@@ -38,16 +36,12 @@ class ProductDetailScreen extends StatelessWidget {
                 ),
               ),
             ),
-          ),
-          SliverList(
-              delegate: SliverChildListDelegate([
             SizedBox(
               height: 10,
             ),
             Text(
               '\$${loadedProduct.price}',
               style: TextStyle(color: Colors.grey, fontSize: 20),
-              textAlign: TextAlign.center,
             ),
             SizedBox(
               height: 10,
@@ -58,28 +52,9 @@ class ProductDetailScreen extends StatelessWidget {
                   loadedProduct.description,
                   textAlign: TextAlign.center,
                   softWrap: true,
-                )),
-            SizedBox(
-              height: 800,
-            )
-          ]))
-        ],
-        // child: Column(
-        //   children: [
-        //     Container(
-        //       width: double.infinity,
-        //       height: 300,
-        //       child: Hero(
-        //         tag: loadedProduct.id,
-        //         child: Image.network(
-        //           loadedProduct.imageUrl,
-        //           fit: BoxFit.cover,
-        //         ),
-        //       ),
-        //     ),
-
-        //   ],
-        // ),
+                ))
+          ],
+        ),
       ),
     );
   }
