@@ -107,6 +107,7 @@ class _AuthCardState extends State<AuthCard>
   final _passwordController = TextEditingController();
   AnimationController _controller;
   Animation<Size> _heightAnimation;
+  Animation<Offset> _slideAnimation;
   Animation<double> _opacityAnimation;
 
   @override
@@ -122,6 +123,9 @@ class _AuthCardState extends State<AuthCard>
     // _heightAnimation.addListener(() => setState(() {}));
     _opacityAnimation = Tween(begin: 0.0, end: 1.0)
         .animate(CurvedAnimation(parent: _controller, curve: Curves.easeIn));
+    _slideAnimation = Tween<Offset>(begin: Offset(0, -1.5), end: Offset(0, 0))
+        .animate(
+            CurvedAnimation(parent: _controller, curve: Curves.fastOutSlowIn));
   }
 
   @override
@@ -264,18 +268,21 @@ class _AuthCardState extends State<AuthCard>
                         maxHeight: _authMode == AuthMode.Signup ? 120 : 0),
                     child: FadeTransition(
                       opacity: _opacityAnimation,
-                      child: TextFormField(
-                        enabled: _authMode == AuthMode.Signup,
-                        decoration:
-                            InputDecoration(labelText: 'Confirm Password'),
-                        obscureText: true,
-                        validator: _authMode == AuthMode.Signup
-                            ? (value) {
-                                if (value != _passwordController.text) {
-                                  return 'Passwords do not match!';
+                      child: SlideTransition(
+                        position: _slideAnimation,
+                        child: TextFormField(
+                          enabled: _authMode == AuthMode.Signup,
+                          decoration:
+                              InputDecoration(labelText: 'Confirm Password'),
+                          obscureText: true,
+                          validator: _authMode == AuthMode.Signup
+                              ? (value) {
+                                  if (value != _passwordController.text) {
+                                    return 'Passwords do not match!';
+                                  }
                                 }
-                              }
-                            : null,
+                              : null,
+                        ),
                       ),
                     ),
                   ),
